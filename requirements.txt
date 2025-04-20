@@ -1,0 +1,16 @@
+# Data handling & analysis
+pandas>=1.4.0
+numpy>=1.21.0
+
+# Plotting
+matplotlib>=3.4.0
+
+# Notebook environment
+jupyterlab>=3.0.0
+
+# Experiment tracking
+wandb>=0.14.0
+
+# Model fine-tuning
+torch>=2.0.0
+transformers>=4.25.0
