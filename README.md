@@ -12,7 +12,7 @@ This repository contains the deliverables for the DI725 final project, which aim
 
 
 ## 📂 Repository Structure  
-/ ├─ data/ # (not committed) placeholder for RISC dataset
+├─ data/ # (not committed) placeholder for RISC dataset
 ├─ notebooks/ # Jupyter notebooks
 │ └─ eda_risc.ipynb # EDA on caption lengths, vocab, image-caption pairs
 ├─ reports/
