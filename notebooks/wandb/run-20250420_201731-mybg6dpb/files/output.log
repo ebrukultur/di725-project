@@ -1,0 +1,22 @@
+Images per split:
+ split
+train    35614
+test      4454
+val       4453
+Name: count, dtype: int64
+
+Captions per split:
+ split
+train    178070
+test      22270
+val       22265
+Name: count, dtype: int64
+count    222605.000000
+mean         12.085200
+std           4.220994
+min           5.000000
+25%           9.000000
+50%          11.000000
+75%          14.000000
+max          51.000000
+Name: cap_len, dtype: float64

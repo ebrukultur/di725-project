@@ -1,0 +1,40 @@
+{
+  "os": "Windows-10-10.0.17763-SP0",
+  "python": "CPython 3.10.17",
+  "startedAt": "2025-04-20T17:17:31.335005Z",
+  "program": "Desktop/di725-term-project/di725-project/notebooks/eda_risc.ipynb",
+  "git": {
+    "remote": "https://github.com/ebrukultur/di725-project.git",
+    "commit": "00d411d43dd5a7a5c3b8ff81587fa0784f69d042"
+  },
+  "email": "kltrebru@gmail.com",
+  "root": "C:\\Users\\Administrator\\Desktop\\di725-term-project\\di725-project\\notebooks",
+  "host": "PRJ-EBRUKULTUR2",
+  "executable": "C:\\ProgramData\\anaconda3\\envs\\di725-a2-clean\\python.exe",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "gpu": "Quadro T2000",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "322122543104",
+      "used": "315529060352"
+    }
+  },
+  "memory": {
+    "total": "68424654848"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 16
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Quadro T2000",
+      "memoryTotal": "4294967296",
+      "cudaCores": 1024,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "12.2"
+}

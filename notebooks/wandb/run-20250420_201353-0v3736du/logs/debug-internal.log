@@ -1,0 +1,26 @@
+{"time":"2025-04-20T20:13:53.8757396+03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"C:\\Users\\Administrator\\Desktop\\di725-term-project\\di725-project\\notebooks\\wandb\\run-20250420_201353-0v3736du\\logs\\debug-core.log"}
+{"time":"2025-04-20T20:13:54.3196012+03:00","level":"INFO","msg":"created new stream","id":"0v3736du"}
+{"time":"2025-04-20T20:13:54.3196012+03:00","level":"INFO","msg":"stream: started","id":"0v3736du"}
+{"time":"2025-04-20T20:13:54.3196012+03:00","level":"INFO","msg":"writer: Do: started","stream_id":"0v3736du"}
+{"time":"2025-04-20T20:13:54.3196012+03:00","level":"INFO","msg":"handler: started","stream_id":"0v3736du"}
+{"time":"2025-04-20T20:13:54.3196012+03:00","level":"INFO","msg":"sender: started","stream_id":"0v3736du"}
+{"time":"2025-04-20T20:13:54.6869452+03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-20T20:13:55.0948185+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:13:57.9746238+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:13:58.156005+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:00.8015434+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:00.8103262+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:04.0768112+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:04.1763522+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:05.5931361+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:05.6001189+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:07.7669703+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:07.8485326+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:09.8725553+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:10.8366605+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:15.7303807+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:17.0071613+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:14:20.940638+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:14:21.5028306+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:16:40.8536469+03:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/trial/di725-project/0v3736du/file_stream"}
+{"time":"2025-04-20T20:16:40.8536469+03:00","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found path=files/trial/di725-project/0v3736du/file_stream: {\"error\":\"run di725-project/0v3736du not found while streaming file\"}"}

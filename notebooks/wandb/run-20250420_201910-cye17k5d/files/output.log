@@ -1,0 +1,44 @@
+Images per split:
+ split
+train    35614
+test      4454
+val       4453
+Name: count, dtype: int64
+
+Captions per split:
+ split
+train    178070
+test      22270
+val       22265
+Name: count, dtype: int64
+count    222605.000000
+mean         12.085200
+std           4.220994
+min           5.000000
+25%           9.000000
+50%          11.000000
+75%          14.000000
+max          51.000000
+Name: cap_len, dtype: float64
+caption
+the          205462
+a            117736
+are          110696
+and          100620
+is            77969
+there         73835
+of            69650
+some          62069
+many          61772
+green         61307
+on            55440
+in            54666
+trees         51464
+buildings     47143
+with          42958
+to            26743
+next          24639
+area          24355
+by            21303
+two           18839
+Name: count, dtype: int64

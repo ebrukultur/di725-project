@@ -1,0 +1,20 @@
+{"time":"2025-04-20T20:17:31.3360266+03:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"C:\\Users\\Administrator\\Desktop\\di725-term-project\\di725-project\\notebooks\\wandb\\run-20250420_201731-mybg6dpb\\logs\\debug-core.log"}
+{"time":"2025-04-20T20:17:31.7237806+03:00","level":"INFO","msg":"created new stream","id":"mybg6dpb"}
+{"time":"2025-04-20T20:17:31.7237806+03:00","level":"INFO","msg":"stream: started","id":"mybg6dpb"}
+{"time":"2025-04-20T20:17:31.7237806+03:00","level":"INFO","msg":"writer: Do: started","stream_id":"mybg6dpb"}
+{"time":"2025-04-20T20:17:31.7237806+03:00","level":"INFO","msg":"sender: started","stream_id":"mybg6dpb"}
+{"time":"2025-04-20T20:17:31.7237806+03:00","level":"INFO","msg":"handler: started","stream_id":"mybg6dpb"}
+{"time":"2025-04-20T20:17:31.9776783+03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-20T20:17:32.3552113+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.3607051+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:32.5498181+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.5544664+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:32.5670002+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.5734917+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:32.6765545+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.6831701+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:32.6916546+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.6987387+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:32.7748058+03:00","level":"INFO","msg":"Pausing system monitor"}
+{"time":"2025-04-20T20:17:32.7820446+03:00","level":"INFO","msg":"Resuming system monitor"}
+{"time":"2025-04-20T20:17:33.8527245+03:00","level":"INFO","msg":"Pausing system monitor"}
