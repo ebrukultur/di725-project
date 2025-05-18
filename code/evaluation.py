@@ -16,7 +16,7 @@ from pycocoevalcap.tokenizer.ptbtokenizer import PTBTokenizer
 from sentence_transformers import SentenceTransformer, util
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────────
-OUTPUT_DIR = "/content/drive/MyDrive/DI 725 Project/out/lora_r4"
+OUTPUT_DIR = "/content/drive/MyDrive/DI 725 Project/out/lora_r4" # Change this path according to the model and hyper-parameter
 CSV_PATH   = "/content/drive/MyDrive/DI 725 Project/data/captions.csv"
 IMAGES_DIR = "/content/drive/MyDrive/DI 725 Project/data/resized"
 BATCH_SIZE = 8
@@ -28,7 +28,7 @@ def main():
     wandb.login()
     run = wandb.init(
         project="di725-project",
-        name="eval-lora-r4",
+        name="eval-lora-r4", # Change this according to the model and hyper-parameter
         config={"output_dir": OUTPUT_DIR, "batch_size": BATCH_SIZE, "max_length": MAX_LEN}
     )
 
