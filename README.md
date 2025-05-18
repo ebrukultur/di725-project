@@ -22,7 +22,7 @@ di725-project/
 ├── data/                        # (not committed) placeholder for RISC dataset
 ├── notebooks/                   # Jupyter notebooks
 │   └── eda_risc.ipynb           # EDA on caption lengths, vocab, image-caption pairs
-├── reports/                     # Phase 1 report files
+├── reports/                     # Report files
 │   └── DI725_project_p1_1741420_report.pdf        # 2‑page IEEE PDF of Phase 1 deliverables
 ├── figures/                     # Generated figures
 │   └── caption_length_histogram.png
