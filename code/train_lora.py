@@ -34,7 +34,14 @@ class RiscCaptionDataset(Dataset):
 
     def __getitem__(self, idx):
         row = self.df.iloc[idx]
-        image = Image.open(os.path.join(self.images_dir, row['image'])).convert('RGB')
+        #image = Image.open(os.path.join(self.images_dir, row['image'])).convert('RGB')
+        img_path = os.path.join(self.images_dir, row['image'])
+        try:
+            image = Image.open(img_path).convert('RGB')
+        except Exception as e:
+            # I/O error: fall back to a blank image
+            print(f"⚠️  Skipping/unreadable {row['image']}: {e}")
+            image = Image.new('RGB', (224,224), (255,255,255))
         text_tokens = " ".join(row['syn_tokens'])
 
         # prepare inputs for encoder+decoder
@@ -143,7 +150,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--csv', type=str, default='/content/drive/MyDrive/DI 725 Project/data/captions_processed.csv')
     parser.add_argument('--images_dir', type=str, default='/content/drive/MyDrive/DI 725 Project/data/images')
-    parser.add_argument('--model_name', type=str, default='google/paligemma2-28b-mix-224')
+    parser.add_argument('--model_name', type=str, default='google/paligemma2-28b-mix-224') #default model is large - change it acc to your hardware specs
     parser.add_argument('--output_dir', type=str, default='outputs')
     parser.add_argument('--wandb_project', type=str, default='risc-image-captioning')
     parser.add_argument('--run_name', type=str, default='lora_train')
