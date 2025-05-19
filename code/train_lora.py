@@ -1,5 +1,4 @@
-# Revised train_lora_fixed.py with full W&B integration and gradient accumulation
-
+# Import libraries
 import os
 import argparse
 import ast
@@ -17,8 +16,10 @@ from transformers.models.paligemma.modeling_paligemma import PaliGemmaForConditi
 from peft import LoraConfig, get_peft_model, TaskType
 import wandb
 
+#RISC Dataset class
 class RiscCaptionDataset(Dataset):
     def __init__(self, csv_path, images_dir, processor, max_len=50, split="train"):
+        # Load csv and filter by the specified split
         df = pd.read_csv(csv_path)
         self.df = df[df["split"] == split].reset_index(drop=True)
         self.images_dir = images_dir
@@ -26,6 +27,7 @@ class RiscCaptionDataset(Dataset):
         self.max_len = max_len
 
     def __len__(self):
+        # total number of samples in this split
         return len(self.df)
 
     def __getitem__(self, idx):
@@ -43,6 +45,7 @@ class RiscCaptionDataset(Dataset):
         syn = row["syn_tokens"]
         tokens = ast.literal_eval(syn) if isinstance(syn, str) else syn
         text = "<image> " + " ".join(tokens)
+        # processor to tokenize both image and text
         proc = self.processor(
             images=image,
             text=text,
@@ -51,6 +54,7 @@ class RiscCaptionDataset(Dataset):
             truncation=True,
             max_length=self.max_len
         )
+        # extract tensors, remove batch dimension
         pixel_values = proc.pixel_values.squeeze(0)
         input_ids = proc.input_ids.squeeze(0)
         attention_mask = proc.attention_mask.squeeze(0)
@@ -61,11 +65,12 @@ class RiscCaptionDataset(Dataset):
         labels[labels == pad_id]  = -100
         labels[labels == img_id]  = -100
 
+        # item returns
         return {
-            "pixel_values":   pixel_values,
-            "input_ids":      input_ids,
-            "attention_mask": attention_mask,
-            "labels":         labels
+            "pixel_values":   pixel_values, #preprocessed image tensor for the model's vision encoder
+            "input_ids":      input_ids, #token IDs for the caption sequence
+            "attention_mask": attention_mask, #attention mask corresponding to input_ids
+            "labels":         labels #pad and image tokens masked
         }
 
 def main():
