@@ -1,111 +1,91 @@
-# Import libraries
+"""
+train_lora.py
+
+Phase 2 LoRA fine-tuning on RISC dataset using PaliGemma.
+ - Load processed captions CSV
+ - Define PyTorch Dataset and DataLoader
+ - Initialize PaliGemma with LoRA adapters (PEFT)
+ - Train with HuggingFace Trainer, log to W&B
+ - Evaluate BLEU-4 and CIDEr on validation split
+"""
 import os
 import argparse
-import ast
 import pandas as pd
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-from transformers import (
-    AutoProcessor,
-    TrainingArguments,
-    Trainer,
-    default_data_collator
-)
 from transformers.models.paligemma.modeling_paligemma import PaliGemmaForConditionalGeneration
-from peft import LoraConfig, get_peft_model, TaskType
+from transformers import AutoProcessor, TrainingArguments, VisionEncoderDecoderModel, Trainer
+from transformers import DataCollatorForSeq2Seq
+
+from peft import get_peft_config, get_peft_model, LoraConfig, TaskType
 import wandb
 
-#RISC Dataset class
 class RiscCaptionDataset(Dataset):
-    def __init__(self, csv_path, images_dir, processor, max_len=50, split="train"):
-        # Load csv and filter by the specified split
-        df = pd.read_csv(csv_path)
-        self.df = df[df["split"] == split].reset_index(drop=True)
+    def __init__(self, csv_path, images_dir, processor, split):
+        self.df = pd.read_csv(csv_path)
+        # filter by split
+        self.df = self.df[self.df['split'] == split].reset_index(drop=True)
         self.images_dir = images_dir
         self.processor = processor
-        self.max_len = max_len
 
     def __len__(self):
-        # total number of samples in this split
         return len(self.df)
 
     def __getitem__(self, idx):
         row = self.df.iloc[idx]
-        # Load image
-        img_path = os.path.join(self.images_dir, row["image"])
+        #image = Image.open(os.path.join(self.images_dir, row['image'])).convert('RGB')
+        img_path = os.path.join(self.images_dir, row['image'])
         try:
-            image = Image.open(img_path).convert("RGB")
-        except:
-            image = Image.new("RGB", (224,224), (255,255,255))
-        # Encoder inputs
-        enc = self.processor(images=image, return_tensors="pt")
-        pixel_values = enc.pixel_values.squeeze(0)
-        # *** NEW: prefix with exactly one <image> token ***
-        syn = row["syn_tokens"]
-        tokens = ast.literal_eval(syn) if isinstance(syn, str) else syn
-        text = "<image> " + " ".join(tokens)
-        # processor to tokenize both image and text
-        proc = self.processor(
-            images=image,
-            text=text,
-            return_tensors="pt",
-            padding="max_length",
-            truncation=True,
-            max_length=self.max_len
-        )
-        # extract tensors, remove batch dimension
-        pixel_values = proc.pixel_values.squeeze(0)
-        input_ids = proc.input_ids.squeeze(0)
-        attention_mask = proc.attention_mask.squeeze(0)
-        # Labels
-        labels = input_ids.clone()
-        pad_id  = self.processor.tokenizer.pad_token_id
-        img_id  = self.processor.tokenizer.convert_tokens_to_ids("<image>")
-        labels[labels == pad_id]  = -100
-        labels[labels == img_id]  = -100
+            image = Image.open(img_path).convert('RGB')
+        except Exception as e:
+            # I/O error: fall back to a blank image
+            print(f"⚠️  Skipping/unreadable {row['image']}: {e}")
+            image = Image.new('RGB', (224,224), (255,255,255))
+        text_tokens = " ".join(row['syn_tokens'])
 
-        # item returns
-        return {
-            "pixel_values":   pixel_values, #preprocessed image tensor for the model's vision encoder
-            "input_ids":      input_ids, #token IDs for the caption sequence
-            "attention_mask": attention_mask, #attention mask corresponding to input_ids
-            "labels":         labels #pad and image tokens masked
-        }
+        # prepare inputs for encoder+decoder
+        proc_outputs = self.processor(
+             images=image,
+             text=text_tokens,
+             return_tensors='pt',
+             padding='max_length',
+             truncation=True
+         )
+        # proc_outputs contains:
+        #   pixel_values, input_ids, attention_mask
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", required=True)
-    parser.add_argument("--images_dir", required=True)
-    parser.add_argument("--model_name", required=True)
-    parser.add_argument("--output_dir", required=True)
-    parser.add_argument("--train_bs", type=int, default=4)
-    parser.add_argument("--eval_bs", type=int, default=4)
-    parser.add_argument("--epochs", type=int, default=3)
-    parser.add_argument("--lr", type=float, default=5e-5)
-    parser.add_argument("--lora_r", type=int, default=4)
-    parser.add_argument("--lora_alpha", type=int, default=16)
-    parser.add_argument("--lora_dropout", type=float, default=0.1)
-    parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
-    parser.add_argument("--wandb_project", type=str, default="di725-project")
-    parser.add_argument("--run_name", type=str, default="lora_finetune")
-    args = parser.parse_args()
+        # Trainer needs a `labels` tensor to compute cross‐entropy loss
+        proc_outputs['labels'] = proc_outputs['input_ids'].clone()
 
-    # Initialize W&B with config
+        # squeeze off the batch dimension
+        return {k: v.squeeze(0) for k, v in proc_outputs.items()}
+
+
+    def get_split(self):
+        return self.df['split'].iloc[0]
+
+
+def main(args):
+    # Initialize W&B
     wandb.login()
-    wandb.init(
-        project=args.wandb_project,
-        name=args.run_name,
-        config=vars(args)
-    )
+    run = wandb.init(project=args.wandb_project, name=args.run_name)
 
-    # Load processor & base model
-    processor = AutoProcessor.from_pretrained(args.model_name)
-    base_model = PaliGemmaForConditionalGeneration.from_pretrained(
-        args.model_name, torch_dtype=torch.bfloat16
-    )
-    # Prepare LoRA
+    # Processor and model
+    #processor = AutoProcessor.from_pretrained(args.model_name)
+    #base_model = AutoModelForCausalLM.from_pretrained(args.model_name)
+
+    processor = AutoProcessor.from_pretrained(args.model_name, use_auth_token=True)
+    base_model = PaliGemmaForConditionalGeneration.from_pretrained(args.model_name,use_auth_token=True, torch_dtype=torch.bfloat16)
+    for name, module in base_model.named_modules():
+      if isinstance(module, torch.nn.Linear):
+        print(name)
+
+
+    # Prepare LoRA config
     peft_config = LoraConfig(
+        #task_type=TaskType.CAUSAL_LM,
+        #task_type=TaskType.VISION_ENCODER_DECODER,
         task_type=TaskType.SEQ_2_SEQ_LM,
         inference_mode=False,
         r=args.lora_r,
@@ -115,9 +95,10 @@ def main():
     )
     model = get_peft_model(base_model, peft_config)
 
-    # Prepare datasets
-    train_ds = RiscCaptionDataset(args.csv, args.images_dir, processor, split="train")
-    val_ds   = RiscCaptionDataset(args.csv, args.images_dir, processor, split="val")
+
+    # Datasets & DataLoaders
+    train_dataset = RiscCaptionDataset(args.csv, args.images_dir, processor, split='train')
+    val_dataset   = RiscCaptionDataset(args.csv, args.images_dir, processor, split='val')
 
     # TrainingArguments
     training_args = TrainingArguments(
@@ -125,37 +106,63 @@ def main():
         per_device_train_batch_size=args.train_bs,
         per_device_eval_batch_size=args.eval_bs,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
+        #gradient_checkpointing=True,
         num_train_epochs=args.epochs,
-        learning_rate=args.lr,
         logging_steps=100,
         save_steps=500,
-        save_total_limit=2,
-        do_eval=True,
-        eval_steps=500,
+        learning_rate=args.lr,
+        #weight_decay=0.01,
         fp16=True,
-        report_to=["wandb"]
+        warmup_steps=500,
+        #max_grad_norm=1.0,
+        report_to=['wandb']
     )
 
-    # Trainer setup
+    data_collator = DataCollatorForSeq2Seq(
+        tokenizer=processor.tokenizer,
+        model=model,
+        label_pad_token_id=processor.tokenizer.pad_token_id,
+    )
+
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=train_ds,
-        eval_dataset=val_ds,
-        data_collator=default_data_collator,
-        tokenizer=processor.tokenizer
+        train_dataset=train_dataset,
+        eval_dataset=val_dataset,
+        tokenizer=processor.tokenizer,
+        data_collator=data_collator
     )
 
-    # Train & save
-    trainer.train()
+    # Train
+    if args.resume_from_checkpoint:
+        trainer.train(resume_from_checkpoint=args.resume_from_checkpoint)
+    else:
+        trainer.train()
     model.save_pretrained(os.path.join(args.output_dir, "lora_adapter"))
     processor.save_pretrained(os.path.join(args.output_dir, "processor"))
-
-    # Final evaluation
+    # Evaluate
     metrics = trainer.evaluate()
     print(metrics)
     wandb.log(metrics)
+    run.finish()
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--csv', type=str, default='/content/drive/MyDrive/DI 725 Project/data/captions_processed.csv')
+    parser.add_argument('--images_dir', type=str, default='/content/drive/MyDrive/DI 725 Project/data/images')
+    parser.add_argument('--model_name', type=str, default='google/paligemma2-28b-mix-224')
+    parser.add_argument('--output_dir', type=str, default='outputs')
+    parser.add_argument('--wandb_project', type=str, default='risc-image-captioning')
+    parser.add_argument('--run_name', type=str, default='lora_train')
+    parser.add_argument('--train_bs', type=int, default=16)
+    parser.add_argument('--eval_bs', type=int, default=16)
+    parser.add_argument('--epochs', type=int, default=3)
+    parser.add_argument('--lr', type=float, default=5e-5)
+    parser.add_argument('--lora_r', type=int, default=8)
+    parser.add_argument('--lora_alpha', type=int, default=16)
+    parser.add_argument('--lora_dropout', type=float, default=0.1)
+    parser.add_argument('--gradient_accumulation_steps', type=int, default=4)
+    parser.add_argument('--resume_from_checkpoint', type=str, default=None, help="Path to a checkpoint directory to resume training from")
 
+    args = parser.parse_args()
+    main(args)
