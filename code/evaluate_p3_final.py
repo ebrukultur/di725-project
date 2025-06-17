@@ -63,16 +63,22 @@ def main():
     references = grouped['caption'].tolist()  # list of lists
 
     # Load processor & model
+    # Load processor
     processor = AutoProcessor.from_pretrained(
-        args.processor_name or args.model_dir
+    args.processor_name or "google/paligemma-3b-pt-224"
     )
     base_model = PaliGemmaForConditionalGeneration.from_pretrained(
-        args.model_dir,
+        args.processor_name or "google/paligemma-3b-pt-224",
         torch_dtype=torch.float16
     )
     model = PeftModel.from_pretrained(
         base_model, args.model_dir, is_trainable=False
     ) if os.path.isdir(args.model_dir) else base_model
+    if isinstance(model, PeftModel):
+      print("✅ LoRA adapter loaded and applied.")
+    else:
+      print("✅ No LoRA adapter loaded — using baseline model.")
+
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
     model.to(device).eval()
 
